@@ -9,7 +9,7 @@ BUILD_DIR=dist
 # -extldflags "-static": Ensures a completely static binary (no CGO dependencies)
 LDFLAGS=-ldflags="-s -w -X main.Version=$(VERSION)"
 
-.PHONY: all clean build-all build-amd64 build-arm64 help install-deps test test-coverage
+.PHONY: all clean build-all build-amd64 build-arm64 help install-deps test test-coverage docker-build docker-up docker-down docker-logs docker-shell
 
 all: help
 
@@ -59,3 +59,29 @@ test-coverage:
 	@go test -v -race -coverprofile=$(BUILD_DIR)/coverage.out ./...
 	@go tool cover -html=$(BUILD_DIR)/coverage.out -o $(BUILD_DIR)/coverage.html
 	@echo "Coverage report generated at $(BUILD_DIR)/coverage.html"
+
+## docker-build: Build Docker images for the network environment
+docker-build:
+	@echo "Building Docker images..."
+	docker compose -f deployments/docker/docker-compose.yml build
+
+## docker-up: Start the network development environment
+docker-up:
+	@echo "Starting network environment..."
+	docker compose -f deployments/docker/docker-compose.yml up -d --build
+
+## docker-down: Stop the network development environment
+docker-down:
+	@echo "Stopping network environment..."
+	docker compose -f deployments/docker/docker-compose.yml down
+
+## docker-logs: Follow logs from the NAT agent
+docker-logs:
+	docker compose -f deployments/docker/docker-compose.yml logs -f nat-agent
+
+## docker-shell: Open a shell in the private instance for testing
+docker-shell:
+	docker compose -f deployments/docker/docker-compose.yml exec private-instance sh
+
+docker-ps:
+	docker compose -f deployments/docker/docker-compose.yml ps
