@@ -13,14 +13,14 @@ The **Open Egress Agent** is the lightweight data-plane component of the Open Eg
 
 ```text
 .
-├── cmd/agent/          # Entry point & Signal handling
+├── cmd/agent/                # Entry point & Signal handling
 ├── internal/
-│   ├── heartbeat/      # Logic for phoning home to Control Plane
-│   ├── kernel/         # Kernel parameter tuning (sysctl)
-│   ├── routing/        # nftables/iptables rule management
-│   └── stats/          # Low-overhead traffic counters
-├── Makefile            # Multi-arch build system (ARM64/AMD64)
-└── open-egress.service # Systemd unit for auto-restart
+│   ├── heartbeat/            # Logic for phoning home to Control Plane
+│   ├── kernel/               # Kernel parameter tuning (sysctl)
+│   ├── routing/              # nftables/iptables rule management
+│   └── stats/                # Low-overhead traffic counters
+├── Makefile                  # Multi-arch build system (ARM64/AMD64)
+└── open-egress-agent.service # Systemd unit for auto-restart
 ```
 
 ## 🚀 Getting Started
@@ -44,7 +44,7 @@ The agent is configured via environment variables or a `.env` file:
 | Variable      | Description                               | Example                           |
 |---------------|-------------------------------------------|-----------------------------------|
 | `CONTROL_URL` | URL of your Open Egress Control Plane     | `https://control.egress.local`    |
-| `API_KEY`     | Auth key for the Control Plane            | `your-secure-token`               |
+| `API_KEY`   | Auth key for the Control Plane            | `your-secure-token`               |
 | `INTERFACE`   | The public-facing network interface       | `eth0`                            |
 | `HB_INTERVAL` | Heartbeat frequency                       | `10s`                             |
 
@@ -54,7 +54,7 @@ To ensure the agent stays running and starts on boot:
 
 ```bash
 sudo cp dist/open-egress-agent-linux-arm64 /usr/local/bin/open-egress-agent
-sudo cp open-egress.service /etc/systemd/system/
+sudo cp open-egress-agent.service /etc/systemd/system/
 sudo systemctl enable --now open-egress-agent
 ```
 
