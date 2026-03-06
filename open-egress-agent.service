@@ -1,0 +1,20 @@
+[Unit]
+Description=Open Egress Agent
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/usr/local/bin
+ExecStart=/usr/local/bin/open-egress-agent
+Restart=always
+RestartSec=5
+LimitNOFILE=65535
+
+# Load configuration from environment file if it exists
+EnvironmentFile=-/etc/default/open-egress-agent
+EnvironmentFile=-/etc/open-egress/.env
+
+[Install]
+WantedBy=multi-user.target
