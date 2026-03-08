@@ -66,6 +66,15 @@ The agent automatically optimizes the Linux networking stack for high-concurrenc
 - `net.netfilter.nf_conntrack_max` (increased for high-traffic nodes)
 - `net.ipv4.tcp_fin_timeout = 15`
 
+## 📊 Logging & Observability
+
+The agent uses structured logging with Go's `log/slog` for better observability and easier parsing in cloud environments. Logs include context such as:
+- **Operations**: `Adding nftables table`, `Kernel parameter updated successfully`.
+- **Context**: `name`, `family`, `path`, `value`, `error`.
+
+Example log entry:
+`2026/03/08 17:03:21 INFO Adding nftables table name=nat family=1`
+
 ## 📄 License
 
 Licensed under the Apache License 2.0.

@@ -35,7 +35,6 @@ func IPForwardInternal(ops OSOps) error {
 	path := "/proc/sys/net/ipv4/ip_forward"
 	desiredValue := "1"
 
-	// Read current state
 	content, err := ops.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("failed to read %s: %w", path, err)

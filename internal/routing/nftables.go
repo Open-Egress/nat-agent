@@ -2,6 +2,7 @@ package routing
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/google/nftables"
 )
@@ -23,7 +24,7 @@ var NewNftablesConn = func() (NftablesConn, error) {
 }
 
 func NftableApply() error {
-	table := []*nftables.Table{
+	tables := []*nftables.Table{
 		{
 			Family: nftables.TableFamilyINet,
 			Name:   "nat",
@@ -33,7 +34,37 @@ func NftableApply() error {
 		},
 	}
 
-	return NftableCreateTables(table)
+	policyAccept := nftables.ChainPolicyAccept
+	chains := []*nftables.Chain{
+		{
+			Name:     "postrouting",
+			Table:    tables[0],
+			Type:     nftables.ChainTypeNAT,
+			Hooknum:  nftables.ChainHookPostrouting,
+			Priority: nftables.ChainPriorityNATSource,
+		},
+		{
+			Name:     "forward",
+			Table:    tables[1],
+			Type:     nftables.ChainTypeFilter,
+			Hooknum:  nftables.ChainHookForward,
+			Priority: nftables.ChainPriorityFilter,
+			Policy:   &policyAccept,
+		},
+	}
+
+	if err := NftableCreateTables(tables); err != nil {
+		slog.Error("failed to create nftables tables", "error", err)
+		return err
+	}
+
+	if err := NftableCreateChain(chains); err != nil {
+		slog.Error("failed to create nftables chains", "error", err)
+		return err
+	}
+
+	slog.Info("nftables configuration applied successfully")
+	return nil
 }
 
 func NftableCreateTables(tables []*nftables.Table) error {
@@ -43,6 +74,7 @@ func NftableCreateTables(tables []*nftables.Table) error {
 	}
 
 	for _, table := range tables {
+		slog.Info("Adding nftables table", "name", table.Name, "family", table.Family)
 		addedTable := conn.AddTable(table)
 		conn.FlushTable(addedTable)
 	}
@@ -58,20 +90,19 @@ func NftableCreateTables(tables []*nftables.Table) error {
 	return nil
 }
 
-func NftableCreateChain(tableName []string) error {
+func NftableCreateChain(chains []*nftables.Chain) error {
 	conn, err := NewNftablesConn()
 	if err != nil {
 		return fmt.Errorf("failed to create nftables connection: %w", err)
 	}
 
-	for _, name := range tableName {
-		conn.AddChain(&nftables.Chain{
-			Name: "postrouting",
-			Table: &nftables.Table{
-				Name:   name,
-				Family: nftables.TableFamilyIPv4,
-			},
-		})
+	for _, chain := range chains {
+		tableName := "unknown"
+		if chain.Table != nil {
+			tableName = chain.Table.Name
+		}
+		slog.Info("Adding nftables chain", "name", chain.Name, "table", tableName)
+		conn.AddChain(chain)
 	}
 
 	if err := conn.Flush(); err != nil {

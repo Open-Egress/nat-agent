@@ -115,7 +115,7 @@ func TestNftableCreateChain(t *testing.T) {
 				}, nil
 			}
 
-			err := routing.NftableCreateChain([]string{"test"})
+			err := routing.NftableCreateChain([]*nftables.Chain{{Name: "test"}})
 			if (err != nil) != tt.expectedErr {
 				t.Errorf("NftableCreateChain() error = %v, expectedErr %v", err, tt.expectedErr)
 			}
