@@ -16,15 +16,15 @@ services:
       - HB_INTERVAL=5s
       - GIN_MODE=debug
     privileged: true # Needed for kernel tuning (sysctl)
-    command: >
-      sh -c "sysctl -w net.ipv4.ip_forward=1 &&
-             nft flush ruleset &&
-             nft add table ip nat &&
-             nft add chain ip nat postrouting '{ type nat hook postrouting priority 100 ; }' &&
-             nft add table ip filter &&
-             nft add chain ip filter forward '{ type filter hook forward priority 0 ; policy accept ; }' &&
-             nft add rule ip nat postrouting oifname eth0 masquerade &&
-             /usr/local/bin/open-egress-agent"
+    # command: >
+    #   sh -c "sysctl -w net.ipv4.ip_forward=1 &&
+    #          nft flush ruleset &&
+    #          nft add table ip nat &&
+    #          nft add chain ip nat postrouting '{ type nat hook postrouting priority 100 ; }' &&
+    #          nft add table ip filter &&
+    #          nft add chain ip filter forward '{ type filter hook forward priority 0 ; policy accept ; }' &&
+    #          nft add rule ip nat postrouting oifname eth0 masquerade &&
+    #          /usr/local/bin/open-egress-agent"
 
   private-instance:
     build:

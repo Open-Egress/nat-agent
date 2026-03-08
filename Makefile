@@ -56,7 +56,7 @@ test:
 test-coverage:
 	@echo "Running tests with coverage..."
 	@mkdir -p $(BUILD_DIR)
-	@go test -v -race -coverprofile=$(BUILD_DIR)/coverage.out ./...
+	@go test -v -race -coverpkg=./internal/... -coverprofile=$(BUILD_DIR)/coverage.out ./...
 	@go tool cover -html=$(BUILD_DIR)/coverage.out -o $(BUILD_DIR)/coverage.html
 	@echo "Coverage report generated at $(BUILD_DIR)/coverage.html"
 
